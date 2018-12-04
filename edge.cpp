@@ -211,6 +211,16 @@ Mat grayscale(Mat img) {
 				retmat.at<Vec3b>(y, x)[1] = 255;
 				retmat.at<Vec3b>(y, x)[2] = 255;
 			}
+			if (x == img.size().width) {
+				retmat.at<Vec3b>(y, x)[0] = 255;
+				retmat.at<Vec3b>(y, x)[1] = 255;
+				retmat.at<Vec3b>(y, x)[2] = 255;
+			}
+			if (y == img.size().height) {
+				retmat.at<Vec3b>(y, x)[0] = 255;
+				retmat.at<Vec3b>(y, x)[1] = 255;
+				retmat.at<Vec3b>(y, x)[2] = 255;
+			}
 		}
 	}
 	return retmat;
