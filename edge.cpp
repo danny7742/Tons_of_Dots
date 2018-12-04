@@ -1,14 +1,15 @@
-
 #include <stdlib.h>
 #include <opencv2/imgproc.hpp>
 #include <stdio.h>
 
+#define DOTSIZE 2
+
 using namespace cv;
 using namespace std;
 float confThreshold;
-Mat element = getStructuringElement(MORPH_RECT, Size(12, 12), Point(3, 3));
+// Mat element = getStructuringElement(MORPH_RECT, Size(12, 12), Point(3, 3));
 int zer[5][3] = { { 1,1,1 },{ 1,0,1 },{ 1,0,1 },{ 1,0,1 },{ 1,1,1 } };
-int one[5][3] = { { 0,0,1 },{ 0,0,1 },{ 0,0,1 },{ 0,0,1 },{ 0,0,1 } };
+int one[5][3] = { { 0,1,0 },{ 0,1,0 },{ 0,1,0 },{ 0,1,0 },{ 0,1,0 } };
 int two[5][3] = { { 1,1,1 },{ 0,0,1 },{ 1,1,1 },{ 1,0,0 },{ 1,1,1 } };
 int three[5][3] = { { 1,1,1 },{ 0,0,1 },{ 1,1,1 },{ 0,0,1 },{ 1,1,1 } };
 int four[5][3] = { { 1,0,1 },{ 1,0,1 },{ 1,1,1 },{ 0,0,1 },{ 0,0,1 } };
@@ -47,9 +48,9 @@ Mat edgecol(Mat  img) {
 }
 //index function. x & y is first pixel the number starts,(left down) index is indexing number
 Mat indexing(Mat img, int index, int x, int y) {
-	char number[3];
+	char number[4];
 	int count = 0;
-	itoa(index, number, 10);
+	_itoa(index, number, 10);
 	for (int i = 0; number[i] != NULL; i++) {
 		count++;
 	}
@@ -59,8 +60,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		if (number[i] == indexes[0]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex) * DOTSIZE); xcol < newx + ((xindex) * DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex) * DOTSIZE); ycol < y + ((yindex) * DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * zer[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * zer[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * zer[yindex][xindex];
@@ -72,8 +73,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[1]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * one[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * one[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * one[yindex][xindex];
@@ -85,8 +86,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[2]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * two[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * two[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * two[yindex][xindex];
@@ -98,8 +99,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[3]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * three[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * three[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * three[yindex][xindex];
@@ -108,11 +109,11 @@ Mat indexing(Mat img, int index, int x, int y) {
 				}
 			}
 		}
-		else if (number[i] == indexes[3]) {
+		else if (number[i] == indexes[4]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * four[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * four[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * four[yindex][xindex];
@@ -124,8 +125,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[5]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * five[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * five[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * five[yindex][xindex];
@@ -134,11 +135,11 @@ Mat indexing(Mat img, int index, int x, int y) {
 				}
 			}
 		}
-		else if (number[i] == indexes[3]) {
+		else if (number[i] == indexes[6]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * six[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * six[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * six[yindex][xindex];
@@ -150,8 +151,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[7]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * seven[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * seven[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * seven[yindex][xindex];
@@ -163,8 +164,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[8]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * eight[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * eight[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * eight[yindex][xindex];
@@ -176,8 +177,8 @@ Mat indexing(Mat img, int index, int x, int y) {
 		else if (number[i] == indexes[9]) {
 			for (int xindex = 0; xindex < 3; xindex++) {
 				for (int yindex = 0; yindex < 5; yindex++) {
-					for (int xcol = newx + ((xindex) * 3); xcol < newx + ((xindex) * 3) + 3; xcol++) {
-						for (int ycol = y + ((yindex) * 3); ycol < y + ((yindex) * 3) + 3; ycol++) {
+					for (int xcol = newx + ((xindex)* DOTSIZE); xcol < newx + ((xindex)* DOTSIZE) + DOTSIZE; xcol++) {
+						for (int ycol = y + ((yindex)* DOTSIZE); ycol < y + ((yindex)* DOTSIZE) + DOTSIZE; ycol++) {
 							img.at<Vec3b>(ycol, xcol)[0] = 255 - 255 * nine[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[1] = 255 - 255 * nine[yindex][xindex];
 							img.at<Vec3b>(ycol, xcol)[2] = 255 - 255 * nine[yindex][xindex];
@@ -186,7 +187,7 @@ Mat indexing(Mat img, int index, int x, int y) {
 				}
 			}
 		}
-		newx = newx + 12;
+		newx = newx + DOTSIZE * 4;
 	}
 	return img;
 }
@@ -434,6 +435,9 @@ Mat collection(Mat img) {
 	// edge function
 	edge = edge_detect(gaus, edge);
 	Mat edgesomething = edgecol(edge); //erode
+	edgesomething = edgecol(edgesomething);
+	edgesomething = edgecol(edgesomething);
+	edgesomething = edgecol(edgesomething);
 	Mat edgetwice = edgecol(edgesomething); // erode twice
 	return edgetwice;
 }
