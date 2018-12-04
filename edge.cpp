@@ -1,10 +1,7 @@
+
 #include <stdlib.h>
 #include <opencv2/imgproc.hpp>
 #include <stdio.h>
-
-
-
-#define resizeSize 2
 
 using namespace cv;
 using namespace std;
@@ -211,12 +208,12 @@ Mat grayscale(Mat img) {
 				retmat.at<Vec3b>(y, x)[1] = 255;
 				retmat.at<Vec3b>(y, x)[2] = 255;
 			}
-			if (x == img.size().width) {
+			if (y == img.size().height) {
 				retmat.at<Vec3b>(y, x)[0] = 255;
 				retmat.at<Vec3b>(y, x)[1] = 255;
 				retmat.at<Vec3b>(y, x)[2] = 255;
 			}
-			if (y == img.size().height) {
+			if (x == img.size().width) {
 				retmat.at<Vec3b>(y, x)[0] = 255;
 				retmat.at<Vec3b>(y, x)[1] = 255;
 				retmat.at<Vec3b>(y, x)[2] = 255;
@@ -295,6 +292,26 @@ Mat edge_detect(Mat grays, Mat labelbycol) {
 				labelbycol.at<Vec3b>(y, x)[1] = 255;
 				labelbycol.at<Vec3b>(y, x)[2] = 255;
 			}
+			if (y < 5) {
+				labelbycol.at<Vec3b>(y, x)[0] = 255;
+				labelbycol.at<Vec3b>(y, x)[1] = 255;
+				labelbycol.at<Vec3b>(y, x)[2] = 255;
+			}
+			if (x < 5) {
+				labelbycol.at<Vec3b>(y, x)[0] = 255;
+				labelbycol.at<Vec3b>(y, x)[1] = 255;
+				labelbycol.at<Vec3b>(y, x)[2] = 255;
+			}
+			if (y > labelbycol.size().height - 5) {
+				labelbycol.at<Vec3b>(y, x)[0] = 255;
+				labelbycol.at<Vec3b>(y, x)[1] = 255;
+				labelbycol.at<Vec3b>(y, x)[2] = 255;
+			}
+			if (x > labelbycol.size().width - 5) {
+				labelbycol.at<Vec3b>(y, x)[0] = 255;
+				labelbycol.at<Vec3b>(y, x)[1] = 255;
+				labelbycol.at<Vec3b>(y, x)[2] = 255;
+			}
 			sumredh = 0;
 			sumblueh = 0;
 			sumgreenh = 0;
@@ -326,15 +343,15 @@ Mat blur(Mat img) {
 	buffer = img.clone();
 	for (int y = 0; y < img.size().height; y++) {
 		for (int x = 0; x < img.size().width; x++) {
-			buffer.at<Vec3b>(y, x)[0] = 0;
-			buffer.at<Vec3b>(y, x)[1] = 0;
-			buffer.at<Vec3b>(y, x)[2] = 0;
+			buffer.at<Vec3b>(y, x)[0] = 255;
+			buffer.at<Vec3b>(y, x)[1] = 255;
+			buffer.at<Vec3b>(y, x)[2] = 255;
 		}
 	}
 
-	for (int y = 1; y<heightm1; y++)
+	for (int y = 1; y<heightm1 - 1; y++)
 	{
-		for (int x = 1; x<widthm1; x++)
+		for (int x = 1; x<widthm1 - 1; x++)
 		{
 			newValue0 = 0;
 			newValue1 = 0;
