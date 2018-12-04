@@ -1,7 +1,10 @@
 #include <iostream>
 #include <cstdio>
 #include <stack>
+#include <deque>
 #include <opencv2/opencv.hpp>
+#include "edge.h"
+
 using namespace std;
 using namespace cv;
 
@@ -22,70 +25,23 @@ enum {
 	N = 0, NE, E, SE, S, SW, W, NW
 };
 
-// øÏ√¯√÷ªÛ¥‹ (0,0)¿œ ∞ÊøÏ
+
 offsets Move[8] = {
 	{ -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
 	{ 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }
 };
 
 
-
-/* void trace_line(element start, int edged_mat[][], bool mark[][]) {
-
-	stack <element> pstack;
-
-	int i, j, row, col, nextRow, nextCol, dir, found = false;
-	element position;
-
-	while (pstack.size()-1 > -1 && !found) {
-		position = pstack.top();
-		pstack.pop();
-		row = position.row;
-		col = position.col;
-		dir = position.dir;
-
-		while (dir < 8 && !found) {
-			nextRow = row + Move[dir].vert;
-			nextCol = col + Move[dir].horiz;
-
-			// Ω√¿€¡°¿∏∑Œ ¥ŸΩ√ µπæ∆ø‘¿ª ∂ß
-			if (nextRow == start.row && nextCol == start.col) {
-				if (edged_mat[nextRow][nextCol] == true)
-					found = true;
-				else
-					break;
-				
-			}
-			else if (edged_mat[nextRow][nextCol] = true && mark[nextRow][nextCol] == false) {
-
-				mark[nextRow][nextCol] = true;
-				position.row = row;
-				position.col = col;
-				position.dir = ++dir;
-
-				pstack.push(position);
-
-				row = nextRow;
-				col = nextCol;
-				dir = 0;
-			}
-			else ++dir;
-
-		}
-	}
-
-}
-*/
-
 int main()
 {
 	cv::Mat origin;
-	origin = cv::imread("example7.jpg", CV_LOAD_IMAGE_COLOR);
+	origin = cv::imread("Ryan.jpg", CV_LOAD_IMAGE_COLOR);
 
 	Mat result;
-	result = cv::imread("example7.jpg", CV_LOAD_IMAGE_COLOR);
+	result = cv::imread("Ryan.jpg", CV_LOAD_IMAGE_COLOR);
 
-
+	result = collection(result);
+	cv::imshow("EDGED", result);
 
 	if (origin.empty())
 	{
@@ -101,18 +57,18 @@ int main()
 	int** edged_mat = new int*[height];
 	for (int i = 0; i < height; ++i) {
 		edged_mat[i] = new int[width];
-		memset(edged_mat[i], 0, sizeof(int)*width); // ∏ﬁ∏∏Æ ∞¯∞£¿ª 0¿∏∑Œ √ ±‚»≠ 
+		memset(edged_mat[i], 0, sizeof(int)*width); // ÔøΩﬁ∏ÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ 0ÔøΩÔøΩÔøΩÔøΩ ÔøΩ ±ÔøΩ»≠ 
 	}
 
 	bool ** mark = new bool*[height];
 	for (int i = 0; i < height; ++i) {
 		mark[i] = new bool[width];
-		memset(mark[i], false, sizeof(bool)*width); // ∏ﬁ∏∏Æ ∞¯∞£¿ª false¿∏∑Œ √ ±‚»≠ 
+		memset(mark[i], false, sizeof(bool)*width); // ÔøΩﬁ∏ÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ falseÔøΩÔøΩÔøΩÔøΩ ÔøΩ ±ÔøΩ»≠ 
 	}
 
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			if (origin.at<Vec3b>(i, j)[0] < 10 && origin.at<Vec3b>(i, j)[1] < 10 && origin.at<Vec3b>(i, j)[2] < 10)
+			if (result.at<Vec3b>(i, j)[0] < 10 && result.at<Vec3b>(i, j)[1] < 10 && result.at<Vec3b>(i, j)[2] < 10)
 				edged_mat[i][j] = 1;
 		}
 	}
@@ -142,9 +98,6 @@ int main()
 		}
 	}
 
-	cv::namedWindow("EXAMPLE01", CV_WINDOW_AUTOSIZE);
-
-
 	element start;
 	start.dir = 2;
 	start.count = 0;
@@ -167,17 +120,17 @@ int main()
 	}
 
 
-	stack <element> pstack;
+	deque <element> pstack;
 
 	int i, j, y, x, nextY, nextX, dir, found = false;
 	int count;
 	element position;
 
-	pstack.push(start);
-	
+	pstack.push_back(start);
+
 	while (pstack.size() > 0 && found == false) {
-		position = pstack.top();
-		pstack.pop();
+		position = pstack.front();
+		pstack.pop_back();
 		y = position.y;
 		x = position.x;
 		dir = position.dir;
@@ -187,9 +140,8 @@ int main()
 			dir = dir % 8;
 			nextX = x + Move[dir].horiz;
 			nextY = y + Move[dir].vert;
-			
 
-			// Ω√¿€¡°¿∏∑Œ ¥ŸΩ√ µπæ∆ø‘¿ª ∂ß
+
 			if (nextX == start.x && nextY == start.y) {
 				if (edged_mat[nextY][nextX] == 1)
 					found = true;
@@ -204,8 +156,8 @@ int main()
 				position.x = x;
 				position.dir = ++dir;
 				position.count = ++count;
-				
-				pstack.push(position);
+
+				pstack.push_back(position);
 
 				/* element e = pstack.top();
 				result.at<Vec3b>(e.y, e.x)[0] = 0;
@@ -224,37 +176,43 @@ int main()
 				++count;
 			}
 		}
-		
+
 	}
 
-/*	for (int i = 0; i < height; i++) {
-		for (int j = 0; j < width; j++) {
-			origin.at<Vec3b>(i, j)[0] = 255;
-			origin.at<Vec3b>(i, j)[1] = 255;
-			origin.at<Vec3b>(i, j)[2] = 255;
-		}
-	}
-
-*/
 	element e;
 	cout << pstack.size() << endl;
 
 	int dotcnt = 0;
-	while (pstack.size() > 0) {
-		e = pstack.top();
-		pstack.pop();
-		if (dotcnt % 10 == 0) {
+	int indexcnt = 1;
+	while (pstack.size() != dotcnt) {
+		e = pstack[dotcnt];
+		if (dotcnt % 50 == 0) {
 			result.at<Vec3b>(e.y, e.x)[0] = 0;
 			result.at<Vec3b>(e.y, e.x)[1] = 0;
 			result.at<Vec3b>(e.y, e.x)[2] = 0;
+
 		}
-		cout << "(" << e.y << "," << e.x << ")" << endl;
+		// cout << "(" << e.y << "," << e.x << ")  " << endl;
+		dotcnt++;
+	}
+
+	result = edgecol(result);
+	result = edgecol(result);
+
+	dotcnt = 0;
+	while(pstack.size() != dotcnt) {
+		e = pstack[dotcnt];
+		if (dotcnt % 50 == 0) {
+			indexing(result, indexcnt, e.x + 5, e.y);
+			indexcnt++;
+			cout << indexcnt << endl;
+		}
 		dotcnt++;
 	}
 
 
-
-	 cv::imshow("EXAMPLE01", result);
+	cv::imshow("ORIGINAL", origin);
+	cv::imshow("RESULT", result);
 	cv::waitKey(0);
 	cv::destroyWindow("EXAMPLE01");
 	return 0;
