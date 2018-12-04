@@ -2,8 +2,14 @@
 #include <opencv2/imgproc.hpp>
 #include <stdio.h>
 
+
+
+#define resizeSize 2
+
 using namespace cv;
 using namespace std;
+float confThreshold;
+Mat element = getStructuringElement(MORPH_RECT, Size(12, 12), Point(3, 3));
 int zer[5][3] = { { 1,1,1 },{ 1,0,1 },{ 1,0,1 },{ 1,0,1 },{ 1,1,1 } };
 int one[5][3] = { { 0,0,1 },{ 0,0,1 },{ 0,0,1 },{ 0,0,1 },{ 0,0,1 } };
 int two[5][3] = { { 1,1,1 },{ 0,0,1 },{ 1,1,1 },{ 1,0,0 },{ 1,1,1 } };
@@ -195,6 +201,16 @@ Mat grayscale(Mat img) {
 			retmat.at<Vec3b>(y, x)[0] = (retmat.at<Vec3b>(y, x)[0] + retmat.at<Vec3b>(y, x)[1] + retmat.at<Vec3b>(y, x)[2]) / 3;
 			retmat.at<Vec3b>(y, x)[1] = (retmat.at<Vec3b>(y, x)[0] + retmat.at<Vec3b>(y, x)[1] + retmat.at<Vec3b>(y, x)[2]) / 3;
 			retmat.at<Vec3b>(y, x)[2] = (retmat.at<Vec3b>(y, x)[0] + retmat.at<Vec3b>(y, x)[1] + retmat.at<Vec3b>(y, x)[2]) / 3;
+			if (y == 0) {
+				retmat.at<Vec3b>(y, x)[0] = 255;
+				retmat.at<Vec3b>(y, x)[1] = 255;
+				retmat.at<Vec3b>(y, x)[2] = 255;
+			}
+			if (x == 0) {
+				retmat.at<Vec3b>(y, x)[0] = 255;
+				retmat.at<Vec3b>(y, x)[1] = 255;
+				retmat.at<Vec3b>(y, x)[2] = 255;
+			}
 		}
 	}
 	return retmat;
@@ -330,6 +346,51 @@ Mat blur(Mat img) {
 	}
 	return buffer;
 }
+float distance(int x, int y, int i, int j) {
+	return float(sqrt(pow(x - i, 2) + pow(y - j, 2)));
+}
+
+double gaussian(float x, double sigma) {
+	return exp(-(pow(x, 2)) / (2 * pow(sigma, 2))) / (2 * CV_PI * pow(sigma, 2));
+
+}
+void applyBilateralFilter(Mat source, Mat filteredImage, int x, int y, int diameter, double sigmaI, double sigmaS) {
+	double iFiltered = 0;
+	double wP = 0;
+	int neighbor_x = 0;
+	int neighbor_y = 0;
+	int half = diameter / 2;
+
+	for (int i = 0; i < diameter; i++) {
+		for (int j = 0; j < diameter; j++) {
+			neighbor_x = x - (half - i);
+			neighbor_y = y - (half - j);
+			double gi = gaussian(source.at<Vec3b>(neighbor_x, neighbor_y)[0] - source.at<Vec3b>(x, y)[0], sigmaI);
+			double gs = gaussian(distance(x, y, neighbor_x, neighbor_y), sigmaS);
+			double w = gi * gs;
+			iFiltered = iFiltered + source.at<Vec3b>(neighbor_x, neighbor_y)[0] * w;
+			wP = wP + w;
+		}
+	}
+	iFiltered = iFiltered / wP;
+	filteredImage.at<Vec3b>(x, y)[0] = iFiltered;
+	filteredImage.at<Vec3b>(x, y)[1] = iFiltered;
+	filteredImage.at<Vec3b>(x, y)[2] = iFiltered;
+
+
+}
+Mat bilateralFilterOwn(Mat source, int diameter, double sigmaI, double sigmaS) {
+	Mat filteredImage = source.clone();
+	int width = source.size().width;
+	int height = source.size().height;
+
+	for (int i = 2; i < height - 2; i++) {
+		for (int j = 2; j < width - 2; j++) {
+			applyBilateralFilter(source, filteredImage, i, j, diameter, sigmaI, sigmaS);
+		}
+	}
+	return filteredImage;
+}
 Mat collection(Mat img) {
 	Mat gray;
 	Mat edge;
@@ -337,9 +398,11 @@ Mat collection(Mat img) {
 	Mat grays;
 	Mat exbg;
 	Mat gaus;
+	Mat bilateral;
 	grays = grayscale(img);
 	edge = grays.clone();
 	gaus = blur(grays);
+	bilateral = bilateralFilterOwn(gaus, 5, 12.0, 16.0);
 	int count = 0;
 	// edge function
 	edge = edge_detect(gaus, edge);
